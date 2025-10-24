@@ -38,7 +38,19 @@ cask "dino" do
   caveats <<~EOS
     Dino requires GTK4 and libadwaita to be installed via Homebrew.
     
-    To trust self-signed XMPP certificates, you may need to add them to:
+    ⚠️  CRITICAL KNOWN ISSUE - Emoji Crash:
+    The app may crash when displaying emoji due to a GTK4/macOS CoreText bug.
+    
+    WORKAROUND: Set this environment variable before running:
+      export PANGOCAIRO_BACKEND=fc
+    
+    Or edit ~/Library/Preferences/im.dino.Dino.plist and add:
+      <key>PANGOCAIRO_BACKEND</key>
+      <string>fc</string>
+    
+    This forces Pango to use FontConfig instead of CoreText for rendering.
+    
+    To trust self-signed XMPP certificates, add them to:
       /usr/local/etc/ca-certificates/cert.pem
     
     For more information, visit: https://dino.im
