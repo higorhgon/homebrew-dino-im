@@ -5,7 +5,7 @@ This is a [Homebrew](https://brew.sh) tap for [Dino](https://dino.im), a modern 
 ## Installation
 
 ```bash
-brew install --cask YOURUSERNAME/tap/dino
+brew install --cask higorhgon/dino-im/dino
 ```
 
 ## What is Dino?
@@ -63,7 +63,7 @@ brew uninstall --zap --cask dino
 
 If you encounter any issues, please report them at:
 - [Dino Issues](https://github.com/dino/dino/issues)
-- [This Tap Issues](https://github.com/YOURUSERNAME/homebrew-tap/issues)
+- [This Tap Issues](https://github.com/higorhgon/homebrew-dino-im/issues)
 
 ## License
 

@@ -2,7 +2,7 @@ cask "dino" do
   version "0.4.4"
   sha256 "d4b921bd46bc2c8c4e4abd20674f11a63ea4fb65b101c589406956282a0ad010"
 
-  url "https://github.com/YOURUSERNAME/homebrew-tap/releases/download/v#{version}/Dino-macOS.tar.gz"
+  url "https://github.com/higorhgon/homebrew-dino-im/releases/download/v#{version}/Dino-macOS.tar.gz"
   name "Dino"
   desc "Modern XMPP/Jabber chat client"
   homepage "https://dino.im"
