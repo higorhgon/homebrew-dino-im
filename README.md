@@ -19,6 +19,15 @@ Dino is a modern open-source chat client for the XMPP/Jabber protocol. It aims t
 - Message corrections and reactions
 - Modern GTK4 interface with libadwaita
 
+This tap distributes a macOS-optimized version with fixes for notification crashes.
+
+## Features of this macOS Build
+
+- ✅ Fixed notification crash that occurred with avatar images
+- ✅ All plugins enabled (HTTP file upload, ICE, OMEMO, OpenPGP, RTP)
+- ✅ Native macOS .app bundle
+- ✅ Automatic dependency management via Homebrew
+
 ## Requirements
 
 - macOS Sonoma (14.0) or later
@@ -33,12 +42,19 @@ If you want to build Dino yourself:
 brew install gdk-pixbuf glib gtk4 libadwaita vala meson ninja pkg-config \
   sqlite gnutls libgcrypt srtp gstreamer icu4c gpgme libnice qrencode libsoup libcanberra
 
-# Clone and build
-git clone https://github.com/dino/dino.git
+# Clone the macOS-fixed version
+git clone https://github.com/higorhgon/dino.git
 cd dino
+
+# Build with proper PKG_CONFIG_PATH for macOS
 PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/local/opt/icu4c/lib/pkgconfig:/usr/local/Homebrew/Library/Homebrew/os/mac/pkgconfig/26:$PKG_CONFIG_PATH" meson setup build
 meson compile -C build
+
+# Run directly
+./build/main/dino
 ```
+
+**Note:** This fork includes a fix for the notification crash on macOS. The upstream Dino repository may crash when displaying notifications with avatar images.
 
 ## Self-Signed Certificates
 
@@ -73,8 +89,14 @@ brew uninstall --zap --cask dino
 ## Issues
 
 If you encounter any issues, please report them at:
-- [Dino Issues](https://github.com/dino/dino/issues)
-- [This Tap Issues](https://github.com/higorhgon/homebrew-dino-im/issues)
+- [macOS Build Issues](https://github.com/higorhgon/dino/issues) - For macOS-specific problems
+- [Upstream Dino Issues](https://github.com/dino/dino/issues) - For general Dino issues
+- [This Tap Issues](https://github.com/higorhgon/homebrew-dino-im/issues) - For Homebrew installation issues
+
+## Credits
+
+- Original Dino: https://github.com/dino/dino
+- macOS fixes and packaging: https://github.com/higorhgon/dino
 
 ## License
 
