@@ -91,18 +91,8 @@ if [ ! -f "${OUTPUT_DIR}/${APP_NAME}/Contents/Resources/AppIcon.icns" ]; then
     fi
 fi
 
-echo "Creating launcher script..."
-cat > "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino" << 'LAUNCHER_EOF'
-#!/bin/bash
-DIR="$(cd "$(dirname "$0")/.." && pwd)"
-export DYLD_LIBRARY_PATH="$DIR/Frameworks:/usr/local/lib:$DYLD_LIBRARY_PATH"
-export XDG_DATA_DIRS="$DIR/Resources:/usr/local/share:$XDG_DATA_DIRS"
-export DINO_PLUGIN_DIR="$DIR/lib/dino/plugins"
-export GST_PLUGIN_PATH="/usr/local/lib/gstreamer-1.0:$GST_PLUGIN_PATH"
-export PANGO_CAIRO_BACKEND=fc
-exec "$DIR/MacOS/dino-bin" "$@"
-LAUNCHER_EOF
-chmod +x "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino"
+# Note: We use dino-bin directly as the executable, with env vars in Info.plist
+# No need for a separate launcher script
 
 echo "Creating Info.plist..."
 cat > "${OUTPUT_DIR}/${APP_NAME}/Contents/Info.plist" << 'PLIST_EOF'
@@ -113,7 +103,7 @@ cat > "${OUTPUT_DIR}/${APP_NAME}/Contents/Info.plist" << 'PLIST_EOF'
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
-	<string>dino</string>
+	<string>dino-bin</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
@@ -136,8 +126,18 @@ cat > "${OUTPUT_DIR}/${APP_NAME}/Contents/Info.plist" << 'PLIST_EOF'
 	<string>Copyright © 2016-2025 Dino contributors</string>
 	<key>LSEnvironment</key>
 	<dict>
+		<key>DYLD_LIBRARY_PATH</key>
+		<string>@executable_path/../Frameworks:/usr/local/lib</string>
+		<key>XDG_DATA_DIRS</key>
+		<string>@executable_path/../Resources:/usr/local/share</string>
+		<key>DINO_PLUGIN_DIR</key>
+		<string>@executable_path/../lib/dino/plugins</string>
+		<key>GST_PLUGIN_PATH</key>
+		<string>/usr/local/lib/gstreamer-1.0</string>
 		<key>PANGO_CAIRO_BACKEND</key>
 		<string>fc</string>
+		<key>CAIRO_NO_EMOJI</key>
+		<string>1</string>
 	</dict>
 </dict>
 </plist>
@@ -146,17 +146,32 @@ PLIST_EOF
 echo "Updating library paths..."
 # Fix library references using install_name_tool
 FRAMEWORKS_DIR="${OUTPUT_DIR}/${APP_NAME}/Contents/Frameworks"
+MACOS_BIN="${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino-bin"
 
-# Update dino-bin
+# Add correct rpath to find Frameworks directory
+install_name_tool -add_rpath "@executable_path/../Frameworks" "${MACOS_BIN}" 2>/dev/null || true
+
+# Update dino-bin - change @rpath references to use @executable_path
+install_name_tool -change "@rpath/libdino.0.dylib" "@executable_path/../Frameworks/libdino.0.dylib" \
+    "${MACOS_BIN}" 2>/dev/null || true
+install_name_tool -change "@rpath/libxmpp-vala.0.dylib" "@executable_path/../Frameworks/libxmpp-vala.0.dylib" \
+    "${MACOS_BIN}" 2>/dev/null || true
+install_name_tool -change "@rpath/libqlite.0.dylib" "@executable_path/../Frameworks/libqlite.0.dylib" \
+    "${MACOS_BIN}" 2>/dev/null || true
+# Also handle non-@rpath references
 install_name_tool -change "libdino.0.dylib" "@executable_path/../Frameworks/libdino.0.dylib" \
-    "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino-bin" 2>/dev/null || true
+    "${MACOS_BIN}" 2>/dev/null || true
 install_name_tool -change "libxmpp-vala.0.dylib" "@executable_path/../Frameworks/libxmpp-vala.0.dylib" \
-    "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino-bin" 2>/dev/null || true
+    "${MACOS_BIN}" 2>/dev/null || true
 install_name_tool -change "libqlite.0.dylib" "@executable_path/../Frameworks/libqlite.0.dylib" \
-    "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino-bin" 2>/dev/null || true
+    "${MACOS_BIN}" 2>/dev/null || true
 
 # Update libdino
 install_name_tool -id "@executable_path/../Frameworks/libdino.0.dylib" \
+    "${FRAMEWORKS_DIR}/libdino.0.dylib" 2>/dev/null || true
+install_name_tool -change "@rpath/libxmpp-vala.0.dylib" "@executable_path/../Frameworks/libxmpp-vala.0.dylib" \
+    "${FRAMEWORKS_DIR}/libdino.0.dylib" 2>/dev/null || true
+install_name_tool -change "@rpath/libqlite.0.dylib" "@executable_path/../Frameworks/libqlite.0.dylib" \
     "${FRAMEWORKS_DIR}/libdino.0.dylib" 2>/dev/null || true
 install_name_tool -change "libxmpp-vala.0.dylib" "@executable_path/../Frameworks/libxmpp-vala.0.dylib" \
     "${FRAMEWORKS_DIR}/libdino.0.dylib" 2>/dev/null || true
@@ -175,15 +190,32 @@ install_name_tool -id "@executable_path/../Frameworks/libqlite.0.dylib" \
 for plugin_path in "${OUTPUT_DIR}/${APP_NAME}/Contents/lib/dino/plugins"/*.dylib; do
     if [ -f "$plugin_path" ]; then
         plugin_name=$(basename "$plugin_path")
-        install_name_tool -change "libdino.0.dylib" "@executable_path/../Frameworks/libdino.0.dylib" \
+        # Add rpath for finding frameworks
+        install_name_tool -add_rpath "@loader_path/../../../Frameworks" "$plugin_path" 2>/dev/null || true
+        # Change @rpath references
+        install_name_tool -change "@rpath/libdino.0.dylib" "@loader_path/../../../Frameworks/libdino.0.dylib" \
             "$plugin_path" 2>/dev/null || true
-        install_name_tool -change "libxmpp-vala.0.dylib" "@executable_path/../Frameworks/libxmpp-vala.0.dylib" \
+        install_name_tool -change "@rpath/libxmpp-vala.0.dylib" "@loader_path/../../../Frameworks/libxmpp-vala.0.dylib" \
             "$plugin_path" 2>/dev/null || true
-        install_name_tool -change "libqlite.0.dylib" "@executable_path/../Frameworks/libqlite.0.dylib" \
+        install_name_tool -change "@rpath/libqlite.0.dylib" "@loader_path/../../../Frameworks/libqlite.0.dylib" \
+            "$plugin_path" 2>/dev/null || true
+        # Change direct references
+        install_name_tool -change "libdino.0.dylib" "@loader_path/../../../Frameworks/libdino.0.dylib" \
+            "$plugin_path" 2>/dev/null || true
+        install_name_tool -change "libxmpp-vala.0.dylib" "@loader_path/../../../Frameworks/libxmpp-vala.0.dylib" \
+            "$plugin_path" 2>/dev/null || true
+        install_name_tool -change "libqlite.0.dylib" "@loader_path/../../../Frameworks/libqlite.0.dylib" \
             "$plugin_path" 2>/dev/null || true
         echo "  - Updated ${plugin_name}"
     fi
 done
+
+echo "Signing the app bundle..."
+codesign --force --deep --sign - "${OUTPUT_DIR}/${APP_NAME}" 2>/dev/null || {
+    echo "  Warning: Could not sign the app bundle"
+    echo "  The app may not launch via 'open' command"
+    echo "  You can sign it manually with: codesign --force --deep --sign - /Applications/Dino.app"
+}
 
 echo ""
 echo "✓ Dino.app bundle created successfully!"
