@@ -45,8 +45,19 @@ meson compile -C build
 If your XMPP server uses a self-signed certificate, you'll need to add it to the system certificate bundle:
 
 ```bash
+# Extract certificate
+openssl s_client -connect your_xmpp_server:5222 -starttls xmpp </dev/null
+   2>/dev/null | openssl x509 -text | sed -ne '/-BEGIN CERTIFICATE-/,/-END
+   CERTIFICATE-/p' > /path/to/your-cert.crt
+
+# Verify it
+openssl x509 -in /path/to/your-cert.crt -text -noout | grep -A2 "Subject:"
+
+# Add to trusted certificates
 sudo cat /path/to/your-cert.crt >> /usr/local/etc/ca-certificates/cert.pem
 ```
+
+*Note*: After adding the certificate, restart Dino for changes to take effect.
 
 ## Uninstall
 
