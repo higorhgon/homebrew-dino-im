@@ -1,6 +1,6 @@
 cask "dino" do
   version "0.4.4"
-  sha256 "a7089b6cc583999cd2a461489b40d2d5984950eac1c778119f1291177dc5b73f"
+  sha256 "137c332a14a0417526593728ae1eb3e775a3ccad54b20573456019dfb1586cba"
 
   url "https://github.com/higorhgon/homebrew-dino-im/releases/download/v#{version}/Dino-macOS.tar.gz"
   name "Dino"
@@ -38,17 +38,9 @@ cask "dino" do
   caveats <<~EOS
     Dino requires GTK4 and libadwaita to be installed via Homebrew.
     
-    ⚠️  CRITICAL KNOWN ISSUE - Emoji Crash:
-    The app may crash when displaying emoji due to a GTK4/macOS CoreText bug.
-    
-    WORKAROUND: Set this environment variable before running:
-      export PANGOCAIRO_BACKEND=fc
-    
-    Or edit ~/Library/Preferences/im.dino.Dino.plist and add:
-      <key>PANGOCAIRO_BACKEND</key>
-      <string>fc</string>
-    
-    This forces Pango to use FontConfig instead of CoreText for rendering.
+    📝 Note on Emoji Rendering:
+    Emoji rendering has been fixed in this version. Emoji-only messages now
+    display at normal size on macOS to prevent CoreText/ImageIO crashes.
     
     To trust self-signed XMPP certificates, add them to:
       /usr/local/etc/ca-certificates/cert.pem
