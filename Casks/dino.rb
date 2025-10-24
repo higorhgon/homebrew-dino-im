@@ -28,6 +28,58 @@ cask "dino" do
   depends_on formula: "libcanberra"
 
   app "Dino.app"
+  
+  postflight do
+    app_path = "#{appdir}/Dino.app"
+    svg_icon = "#{app_path}/Contents/Resources/icons/scalable/apps/im.dino.Dino.svg"
+    icns_icon = "#{app_path}/Contents/Resources/AppIcon.icns"
+    
+    # Convert SVG to ICNS using macOS tools
+    system_command "/usr/bin/qlmanage",
+                   args: ["-t", "-s", "512", "-o", "#{app_path}/Contents/Resources", svg_icon],
+                   print_stderr: false
+    
+    # Rename the generated PNG
+    png_file = "#{app_path}/Contents/Resources/im.dino.Dino.svg.png"
+    if File.exist?(png_file)
+      iconset_dir = "#{app_path}/Contents/Resources/AppIcon.iconset"
+      system_command "/bin/mkdir",
+                     args: ["-p", iconset_dir]
+      
+      # Create iconset with different sizes
+      [16, 32, 64, 128, 256, 512].each do |size|
+        system_command "/usr/bin/sips",
+                       args: ["-z", size.to_s, size.to_s, png_file, "--out",
+                              "#{iconset_dir}/icon_#{size}x#{size}.png"],
+                       print_stderr: false
+        if size <= 256
+          system_command "/usr/bin/sips",
+                         args: ["-z", (size * 2).to_s, (size * 2).to_s, png_file, "--out",
+                                "#{iconset_dir}/icon_#{size}x#{size}@2x.png"],
+                         print_stderr: false
+        end
+      end
+      
+      # Convert iconset to icns
+      system_command "/usr/bin/iconutil",
+                     args: ["-c", "icns", iconset_dir, "-o", icns_icon]
+      
+      # Clean up temporary files
+      system_command "/bin/rm",
+                     args: ["-rf", iconset_dir, png_file]
+    end
+    
+    # Update Info.plist to reference the icon
+    system_command "/usr/bin/plutil",
+                   args: ["-insert", "CFBundleIconFile", "-string", "AppIcon",
+                          "#{app_path}/Contents/Info.plist"]
+    
+    # Force macOS to recognize the changes
+    system_command "/usr/bin/touch",
+                   args: [app_path]
+    system_command "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister",
+                   args: ["-f", app_path]
+  end
 
   zap trash: [
     "~/.local/share/dino",
