@@ -4,7 +4,7 @@
 
 **File:** Dino-macOS.tar.gz  
 **Size:** 2.5 MB  
-**SHA256:** `1769d6a44b9b496d44c8ac12a120e26f4a004f68e6a42771b5ef8a634130b55a`
+**SHA256:** `a7089b6cc583999cd2a461489b40d2d5984950eac1c778119f1291177dc5b73f`
 
 ## What's New in This Release
 
