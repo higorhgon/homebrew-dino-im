@@ -99,6 +99,7 @@ export DYLD_LIBRARY_PATH="$DIR/Frameworks:/usr/local/lib:$DYLD_LIBRARY_PATH"
 export XDG_DATA_DIRS="$DIR/Resources:/usr/local/share:$XDG_DATA_DIRS"
 export DINO_PLUGIN_DIR="$DIR/lib/dino/plugins"
 export GST_PLUGIN_PATH="/usr/local/lib/gstreamer-1.0:$GST_PLUGIN_PATH"
+export PANGO_CAIRO_BACKEND=fc
 exec "$DIR/MacOS/dino-bin" "$@"
 LAUNCHER_EOF
 chmod +x "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino"
@@ -133,6 +134,11 @@ cat > "${OUTPUT_DIR}/${APP_NAME}/Contents/Info.plist" << 'PLIST_EOF'
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2016-2025 Dino contributors</string>
+	<key>LSEnvironment</key>
+	<dict>
+		<key>PANGO_CAIRO_BACKEND</key>
+		<string>fc</string>
+	</dict>
 </dict>
 </plist>
 PLIST_EOF
