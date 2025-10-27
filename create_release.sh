@@ -13,12 +13,22 @@ echo "================================================"
 echo ""
 
 # Step 1: Build Dino
-echo "Step 1: Building Dino from source..."
+echo "Step 1: Checking prerequisites..."
 if [ ! -d "${HOME}/dino" ]; then
     echo "Error: Dino source not found at ~/dino"
     echo "Please clone: git clone https://github.com/higorhgon/dino.git ~/dino"
     exit 1
 fi
+
+if [ ! -f "${SCRIPT_DIR}/Resources/AppIcon.icns" ]; then
+    echo "Error: AppIcon.icns not found"
+    echo "Run: ./create_icns.sh"
+    exit 1
+fi
+echo "  ✓ Prerequisites OK"
+echo ""
+
+echo "Step 2: Building Dino from source..."
 
 cd "${HOME}/dino"
 echo "  Rebuilding..."
@@ -29,8 +39,8 @@ meson compile -C build || {
 echo "  ✓ Build completed"
 echo ""
 
-# Step 2: Create app bundle
-echo "Step 2: Creating Dino.app bundle..."
+# Step 3: Create app bundle
+echo "Step 3: Creating Dino.app bundle..."
 cd "${SCRIPT_DIR}"
 ./create_app_bundle.sh || {
     echo "Error: Bundle creation failed"
@@ -38,8 +48,8 @@ cd "${SCRIPT_DIR}"
 }
 echo ""
 
-# Step 3: Create tarball
-echo "Step 3: Creating distribution tarball..."
+# Step 4: Create tarball
+echo "Step 4: Creating distribution tarball..."
 if [ -f "Dino-macOS.tar.gz" ]; then
     echo "  Removing old tarball..."
     rm -f Dino-macOS.tar.gz
@@ -50,14 +60,14 @@ TARBALL_SIZE=$(ls -lh Dino-macOS.tar.gz | awk '{print $5}')
 echo "  ✓ Created Dino-macOS.tar.gz (${TARBALL_SIZE})"
 echo ""
 
-# Step 4: Calculate checksums
-echo "Step 4: Calculating checksums..."
+# Step 5: Calculate checksums
+echo "Step 5: Calculating checksums..."
 SHA256=$(shasum -a 256 Dino-macOS.tar.gz | awk '{print $1}')
 echo "  SHA256: ${SHA256}"
 echo ""
 
-# Step 5: Update Cask formula
-echo "Step 5: Cask formula information..."
+# Step 6: Update Cask formula
+echo "Step 6: Cask formula information..."
 echo ""
 echo "Update Casks/dino.rb with:"
 echo "  version \"${VERSION}\""
@@ -67,8 +77,8 @@ echo "After uploading to GitHub release, update the URL to:"
 echo "  url \"https://github.com/higorhgon/homebrew-dino-im/releases/download/v${VERSION}/Dino-macOS.tar.gz\""
 echo ""
 
-# Step 6: Test extraction
-echo "Step 6: Testing tarball extraction..."
+# Step 7: Test extraction
+echo "Step 7: Testing tarball extraction..."
 TEST_DIR="/tmp/dino_release_test_$$"
 mkdir -p "${TEST_DIR}"
 cd "${TEST_DIR}"
