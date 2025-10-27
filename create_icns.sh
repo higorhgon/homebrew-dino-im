@@ -26,12 +26,12 @@ for size in 16 32 128 256 512; do
     
     # Standard resolution - convert SVG to PNG with white background
     rsvg-convert -w ${size} -h ${size} "${SVG_FILE}" -o "${ICONSET_DIR}/temp_${size}.png"
-    convert "${ICONSET_DIR}/temp_${size}.png" -background white -alpha remove -alpha off "${ICONSET_DIR}/icon_${size}x${size}.png"
+    magick "${ICONSET_DIR}/temp_${size}.png" -background white -alpha remove -alpha off "${ICONSET_DIR}/icon_${size}x${size}.png"
     rm "${ICONSET_DIR}/temp_${size}.png"
     
     # Retina resolution - convert SVG to PNG with white background
     rsvg-convert -w ${size2x} -h ${size2x} "${SVG_FILE}" -o "${ICONSET_DIR}/temp_${size2x}.png"
-    convert "${ICONSET_DIR}/temp_${size2x}.png" -background white -alpha remove -alpha off "${ICONSET_DIR}/icon_${size}x${size}@2x.png"
+    magick "${ICONSET_DIR}/temp_${size2x}.png" -background white -alpha remove -alpha off "${ICONSET_DIR}/icon_${size}x${size}@2x.png"
     rm "${ICONSET_DIR}/temp_${size2x}.png"
 done
 
