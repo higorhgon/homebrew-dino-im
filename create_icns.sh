@@ -19,16 +19,20 @@ echo "Creating AppIcon.icns from SVG..."
 ICONSET_DIR=$(mktemp -d)/AppIcon.iconset
 mkdir -p "${ICONSET_DIR}"
 
-# Generate all required icon sizes
+# Generate all required icon sizes with white background
 for size in 16 32 128 256 512; do
     size2x=$((size * 2))
     echo "  Generating ${size}x${size} icons..."
     
-    # Standard resolution
-    rsvg-convert -w ${size} -h ${size} "${SVG_FILE}" -o "${ICONSET_DIR}/icon_${size}x${size}.png"
+    # Standard resolution - convert SVG to PNG with white background
+    rsvg-convert -w ${size} -h ${size} "${SVG_FILE}" -o "${ICONSET_DIR}/temp_${size}.png"
+    convert "${ICONSET_DIR}/temp_${size}.png" -background white -alpha remove -alpha off "${ICONSET_DIR}/icon_${size}x${size}.png"
+    rm "${ICONSET_DIR}/temp_${size}.png"
     
-    # Retina resolution
-    rsvg-convert -w ${size2x} -h ${size2x} "${SVG_FILE}" -o "${ICONSET_DIR}/icon_${size}x${size}@2x.png"
+    # Retina resolution - convert SVG to PNG with white background
+    rsvg-convert -w ${size2x} -h ${size2x} "${SVG_FILE}" -o "${ICONSET_DIR}/temp_${size2x}.png"
+    convert "${ICONSET_DIR}/temp_${size2x}.png" -background white -alpha remove -alpha off "${ICONSET_DIR}/icon_${size}x${size}@2x.png"
+    rm "${ICONSET_DIR}/temp_${size2x}.png"
 done
 
 # Convert iconset to icns
