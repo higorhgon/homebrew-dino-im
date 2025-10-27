@@ -63,13 +63,16 @@ After building, you can create a distributable `.app` bundle:
 git clone https://github.com/higorhgon/homebrew-dino-im.git
 cd homebrew-dino-im
 
+# Generate the app icon (only needed once, already included in repo)
+./create_icns.sh
+
 # Run the bundle creation script
 ./create_app_bundle.sh
 
 # This creates Dino.app ready for installation or distribution
 ```
 
-See [BUILD_APP.md](BUILD_APP.md) for detailed documentation on the app bundle creation process.
+The app icon is generated from the official Dino SVG icon and included in the `Resources/` directory. See [BUILD_APP.md](BUILD_APP.md) for detailed documentation on the app bundle creation process.
 
 **Note:** This fork includes fixes for macOS-specific crashes:
 - ✅ Fixed notification crash with avatar images

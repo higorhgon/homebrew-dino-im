@@ -80,15 +80,14 @@ if [ -d "${DINO_BUILD}/main/po" ]; then
     done
 fi
 
-# Create app icon (use a simple placeholder if no icon exists)
-echo "Creating app icon..."
-if [ ! -f "${OUTPUT_DIR}/${APP_NAME}/Contents/Resources/AppIcon.icns" ]; then
-    # Try to find the icon in the source
-    if [ -f "${DINO_SOURCE}/main/data/icons/scalable/apps/im.dino.Dino.svg" ]; then
-        # For now, just note that icon conversion would be needed
-        echo "  Note: SVG icon found, but ICNS conversion requires additional tools"
-        echo "  You can convert manually with: iconutil or third-party tools"
-    fi
+# Copy app icon
+echo "Copying app icon..."
+if [ -f "${SCRIPT_DIR}/Resources/AppIcon.icns" ]; then
+    cp "${SCRIPT_DIR}/Resources/AppIcon.icns" "${OUTPUT_DIR}/${APP_NAME}/Contents/Resources/"
+    echo "  ✓ AppIcon.icns copied"
+else
+    echo "  Warning: AppIcon.icns not found in ${SCRIPT_DIR}/Resources/"
+    echo "  Run ./create_icns.sh first to generate the icon"
 fi
 
 # Note: We use dino-bin directly as the executable, with env vars in Info.plist
