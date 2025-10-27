@@ -34,8 +34,8 @@ mkdir -p "${OUTPUT_DIR}/${APP_NAME}/Contents/lib/dino/plugins"
 mkdir -p "${OUTPUT_DIR}/${APP_NAME}/Contents/share"
 
 echo "Copying main binary..."
-cp "${DINO_BUILD}/main/dino" "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino-bin"
-chmod +x "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino-bin"
+cp "${DINO_BUILD}/main/dino" "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino"
+chmod +x "${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino"
 
 echo "Copying libraries..."
 cp "${DINO_BUILD}/libdino/libdino.0.dylib" "${OUTPUT_DIR}/${APP_NAME}/Contents/Frameworks/"
@@ -103,7 +103,7 @@ cat > "${OUTPUT_DIR}/${APP_NAME}/Contents/Info.plist" << 'PLIST_EOF'
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
-	<string>dino-bin</string>
+	<string>dino</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
@@ -134,10 +134,10 @@ cat > "${OUTPUT_DIR}/${APP_NAME}/Contents/Info.plist" << 'PLIST_EOF'
 		<string>@executable_path/../lib/dino/plugins</string>
 		<key>GST_PLUGIN_PATH</key>
 		<string>/usr/local/lib/gstreamer-1.0</string>
-		<key>PANGO_CAIRO_BACKEND</key>
-		<string>fc</string>
-		<key>CAIRO_NO_EMOJI</key>
-		<string>1</string>
+		<key>PANGOCAIRO_BACKEND</key>
+		<string>fontconfig</string>
+		<key>GTK_IM_MODULE</key>
+		<string>gtk-im-context-simple</string>
 	</dict>
 </dict>
 </plist>
@@ -146,7 +146,7 @@ PLIST_EOF
 echo "Updating library paths..."
 # Fix library references using install_name_tool
 FRAMEWORKS_DIR="${OUTPUT_DIR}/${APP_NAME}/Contents/Frameworks"
-MACOS_BIN="${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino-bin"
+MACOS_BIN="${OUTPUT_DIR}/${APP_NAME}/Contents/MacOS/dino"
 
 # Add correct rpath to find Frameworks directory
 install_name_tool -add_rpath "@executable_path/../Frameworks" "${MACOS_BIN}" 2>/dev/null || true
