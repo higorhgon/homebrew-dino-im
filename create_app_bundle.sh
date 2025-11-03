@@ -64,6 +64,16 @@ if [ -d "${DINO_SOURCE}/main/data/icons" ]; then
     cp -r "${DINO_SOURCE}/main/data/icons" "${OUTPUT_DIR}/${APP_NAME}/Contents/Resources/"
 fi
 
+# Copy emoji font from repository
+echo "Copying emoji font..."
+if [ -f "${SCRIPT_DIR}/Resources/fonts/NotoColorEmoji.ttf" ]; then
+    mkdir -p "${OUTPUT_DIR}/${APP_NAME}/Contents/Resources/fonts"
+    cp "${SCRIPT_DIR}/Resources/fonts/NotoColorEmoji.ttf" "${OUTPUT_DIR}/${APP_NAME}/Contents/Resources/fonts/"
+    echo "  ✓ Noto Color Emoji bundled"
+else
+    echo "  Warning: Noto Color Emoji not found in Resources/fonts/"
+fi
+
 # Copy locale files if they exist
 if [ -d "${DINO_BUILD}/main/po" ]; then
     mkdir -p "${OUTPUT_DIR}/${APP_NAME}/Contents/share/locale"
