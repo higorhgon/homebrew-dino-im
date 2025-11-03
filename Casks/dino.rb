@@ -1,6 +1,6 @@
 cask "dino" do
   version "0.4.4"
-  sha256 "6da8d5545cd4e96b35593d21a5105a97e5cc691e0cc4960ffa87040cb5c70bcf"
+  sha256 "983adcb6c1ad01a0c79efe32e352795d4bee973647f442ee65e1b77ffeab8c88"
 
   url "https://github.com/higorhgon/homebrew-dino-im/releases/download/v#{version}/Dino-macOS.tar.gz"
   name "Dino"
