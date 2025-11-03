@@ -133,10 +133,10 @@ cat > "${OUTPUT_DIR}/${APP_NAME}/Contents/Info.plist" << 'PLIST_EOF'
 		<string>@executable_path/../lib/dino/plugins</string>
 		<key>GST_PLUGIN_PATH</key>
 		<string>/usr/local/lib/gstreamer-1.0</string>
+		<key>GTK_IM_MODULE</key>
+		<string>quartz</string>
 		<key>PANGOCAIRO_BACKEND</key>
 		<string>fontconfig</string>
-		<key>GTK_IM_MODULE</key>
-		<string>gtk-im-context-simple</string>
 	</dict>
 </dict>
 </plist>
